@@ -3,7 +3,8 @@ defmodule UriTemplate do
   @moduledoc """
 
     [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
-    processor. 
+    processor. Currently supports level 3 completely and parts of level 4.
+
 
   """
 
@@ -29,9 +30,6 @@ defmodule UriTemplate do
 
         iex> UriTemplate.expand("http://example.com/test", id: 42)
         "http://example.com/test"
-
-        iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
-        "http://example.com/40,-105"
 
         iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
         "http://example.com/40,-105"
@@ -113,7 +111,14 @@ defmodule UriTemplate do
         val |> to_string
     end
   end
+  defp d(arg, msg \\ nil) do
+    case msg do
+      nil -> IO.inspect arg
+      _ ->   IO.puts "#{msg}: #{inspect arg}"
+    end
 
+    arg
+  end
   defp parse_expression(expression) do
     %{"op" => op, "vars" => varlist} =
       Regex.named_captures(~r/(?<op>[+\#.\/;?&=,!@|]?)(?<vars>.*)/, expression)

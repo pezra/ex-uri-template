@@ -23,14 +23,8 @@ iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
 iex> UriTemplate.expand("http://example.com?{k}", k: [one: 1, two: 2])
 "http://example.com?one,1,two,2"
 
-iex> UriTemplate.expand("http://example.com?{k+}", k: [one: 1, two: 2])
-"http://example.com?one=1,two=2"
-
 iex> UriTemplate.expand("http://example.com/test", id: 42)
 "http://example.com/test"
-
-iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
-"http://example.com/40,-105"
 
 iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
 "http://example.com/40,-105"
