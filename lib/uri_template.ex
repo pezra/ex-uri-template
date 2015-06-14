@@ -1,4 +1,12 @@
+
 defmodule UriTemplate do
+  @moduledoc """
+
+    [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
+    processor. 
+
+  """
+
   @doc """
     Expand a RFC 6570 compliant URI template in to a full URI.
 
@@ -6,6 +14,12 @@ defmodule UriTemplate do
 
         iex> UriTemplate.expand("http://example.com/{id}", id: 42)
         "http://example.com/42"
+
+        iex> UriTemplate.expand("http://example.com?q={terms}", terms: "fiz buzz")
+        "http://example.com?q=fiz%20buzz"
+
+        iex> UriTemplate.expand("http://example.com?q={+terms}", terms: "fiz%20buzz")
+        "http://example.com?q=fiz%20buzz"
 
         iex> UriTemplate.expand("http://example.com/test", id: 42)
         "http://example.com/test"
@@ -59,12 +73,25 @@ defmodule UriTemplate do
   end
 
   defp expand_varspec(varspec, vars, op) do
-    val = Dict.get(vars, varspec, "") |> to_string
+    val = Dict.get(vars, varspec, "") |> to_string |> URI.encode
 
     cond do
-      name_value_pair_op?(op) -> "#{varspec}=#{val}"
-      true -> to_string(val)
+      name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars)
+      op === "+"              -> expand_reserved_varspec(varspec, vars)
+      true                    -> expand_basic_varspec(varspec, vars)
     end
+  end
+
+  defp expand_nvp_varspec(varspec, vars) do
+    "#{varspec}=#{expand_basic_varspec(varspec, vars)}"
+  end
+
+  defp expand_basic_varspec(varspec, vars) do
+    expand_reserved_varspec(varspec, vars) |> URI.encode
+  end
+
+  defp expand_reserved_varspec(varspec, vars) do
+    Dict.get(vars, varspec, "") |> to_string
   end
 
   defp parse_expression(expression) do
@@ -82,9 +109,9 @@ defmodule UriTemplate do
     case op do
       ""  -> Stream.iterate("",  fn _ -> "," end)
       "#" -> Stream.iterate("#", fn _ -> "," end)
+      "+" -> Stream.iterate("",  fn _ -> "," end)
       "?" -> Stream.iterate("?", fn _ -> "&" end)
       _   -> Stream.cycle([op])
     end
-
   end
 end
