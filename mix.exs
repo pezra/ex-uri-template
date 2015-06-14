@@ -3,18 +3,33 @@ defmodule UriTemplate.Mixfile do
 
   def project do
     [app: :uri_template,
+     description: "RFC 6570 complient URI template processor",
      version: "1.0.0",
      elixir: "~> 1.0",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps,
+     package: package]
+  end
+
+  defp git_files do
+    System.cmd("git", ["ls-files", "-z"])
+      |> (fn {x,_} -> x end).()
+      |> String.split(<<0>>)
+      |> Enum.filter(fn x -> x != "" end)
+
+  end
+
+  defp package do
+    [files: git_files,
+      licenses: ["http://opensource.org/licenses/MIT"],
+      contributors: ["Peter Williams"],
+      links: %{"homepage": "http://github.com/pezra/ex-uri-template"}]
   end
 
   # Configuration for the OTP application
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    []
   end
 
   # Dependencies can be Hex packages:
