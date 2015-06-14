@@ -20,7 +20,7 @@ defmodule UriTemplate.Mixfile do
   defp package do
     [files: git_files,
       licenses: ["http://opensource.org/licenses/MIT"],
-      contributors: ["Peter Williams"],
+      contributors: ["Peter Williams", "Julius Beckmann"],
       links: %{"homepage": "http://github.com/pezra/ex-uri-template"}]
   end
 
