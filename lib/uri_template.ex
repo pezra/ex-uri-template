@@ -21,6 +21,9 @@ defmodule UriTemplate do
         iex> UriTemplate.expand("http://example.com?q={+terms}", terms: "fiz%20buzz")
         "http://example.com?q=fiz%20buzz"
 
+        iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
+        "http://example.com?q=fiz,buzz"
+
         iex> UriTemplate.expand("http://example.com/test", id: 42)
         "http://example.com/test"
 
@@ -77,7 +80,7 @@ defmodule UriTemplate do
 
     cond do
       name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars)
-      op === "+"              -> expand_reserved_varspec(varspec, vars)
+      op === "+"              -> raw_expand_varspec(varspec, vars)
       true                    -> expand_basic_varspec(varspec, vars)
     end
   end
@@ -87,11 +90,16 @@ defmodule UriTemplate do
   end
 
   defp expand_basic_varspec(varspec, vars) do
-    expand_reserved_varspec(varspec, vars) |> URI.encode
+    raw_expand_varspec(varspec, vars) |> URI.encode
   end
 
-  defp expand_reserved_varspec(varspec, vars) do
-    Dict.get(vars, varspec, "") |> to_string
+  defp raw_expand_varspec(varspec, vars) do
+    case Dict.get(vars, varspec, "") do
+      vals when is_list(vals) ->
+        Enum.join(vals, ",")
+      val ->
+        to_string(val)
+    end
   end
 
   defp parse_expression(expression) do
