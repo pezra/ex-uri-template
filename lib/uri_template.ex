@@ -24,6 +24,9 @@ defmodule UriTemplate do
         iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
         "http://example.com?q=fiz,buzz"
 
+        iex> UriTemplate.expand("http://example.com?{k}", k: [one: 1, two: 2])
+        "http://example.com?one,1,two,2"
+
         iex> UriTemplate.expand("http://example.com/test", id: 42)
         "http://example.com/test"
 
@@ -76,11 +79,9 @@ defmodule UriTemplate do
   end
 
   defp expand_varspec(varspec, vars, op) do
-    val = Dict.get(vars, varspec, "") |> to_string |> URI.encode
-
     cond do
       name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars)
-      op === "+"              -> raw_expand_varspec(varspec, vars)
+      op == "+"               -> raw_expand_varspec(varspec, vars)
       true                    -> expand_basic_varspec(varspec, vars)
     end
   end
@@ -94,11 +95,22 @@ defmodule UriTemplate do
   end
 
   defp raw_expand_varspec(varspec, vars) do
-    case Dict.get(vars, varspec, "") do
+    Dict.get(vars, varspec, "") |> render_to_string
+  end
+
+  defp render_to_string(val) do
+    case val do
+      vals when is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2 ->
+        vals
+          |> Enum.flat_map(fn {a,b} -> [a,b] end)
+          |> render_to_string
+
       vals when is_list(vals) ->
-        Enum.join(vals, ",")
+        vals
+          |> Enum.join(",")
+
       val ->
-        to_string(val)
+        val |> to_string
     end
   end
 
