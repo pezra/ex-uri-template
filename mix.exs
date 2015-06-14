@@ -15,7 +15,6 @@ defmodule UriTemplate.Mixfile do
       |> (fn {x,_} -> x end).()
       |> String.split(<<0>>)
       |> Enum.filter(fn x -> x != "" end)
-
   end
 
   defp package do

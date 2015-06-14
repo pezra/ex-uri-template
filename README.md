@@ -48,3 +48,11 @@ iex> UriTemplate.expand("http://example.com{#lat,lng}", lat: 40, lng: -105)
 "http://example.com#40,-105"
 ```
 
+Installation
+----
+
+Add the following to your project `:deps` list:
+
+```elixir
+{:uri_template, "~>1.0"}
+```
