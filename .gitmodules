@@ -1,0 +1,3 @@
+[submodule "vendor/uritemplate-test"]
+	path = vendor/uritemplate-test
+	url = git@github.com:uri-templates/uritemplate-test.git

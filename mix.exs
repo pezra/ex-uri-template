@@ -18,10 +18,11 @@ defmodule UriTemplate.Mixfile do
   end
 
   defp package do
-    [files: git_files,
+    [ files: git_files,
       licenses: ["http://opensource.org/licenses/MIT"],
       contributors: ["Peter Williams", "Julius Beckmann"],
       links: %{"homepage": "http://github.com/pezra/ex-uri-template"}]
+      links: %{"homepage": "http://github.com/pezra/ex-uri-template"} ]
   end
 
   # Configuration for the OTP application
@@ -41,6 +42,6 @@ defmodule UriTemplate.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [{:poison, "~> 1.4", only: :test}]
   end
 end
