@@ -16,12 +16,6 @@ defmodule UriTemplate do
         iex> UriTemplate.expand("http://example.com/{id}", id: 42)
         "http://example.com/42"
 
-        iex> UriTemplate.expand("http://example.com?q={terms}", terms: "fiz buzz")
-        "http://example.com?q=fiz%20buzz"
-
-        iex> UriTemplate.expand("http://example.com?q={+terms}", terms: "fiz%20buzz")
-        "http://example.com?q=fiz%20buzz"
-
         iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
         "http://example.com?q=fiz,buzz"
 
@@ -63,7 +57,7 @@ defmodule UriTemplate do
     [prefix, expand_expression(expr, vars)]
   end
 
-  defp expand_part(vars, [prefix]) do
+  defp expand_part(_, [prefix]) do
     [prefix]
   end
 
@@ -78,47 +72,47 @@ defmodule UriTemplate do
 
   defp expand_varspec(varspec, vars, op) do
     cond do
-      name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars)
-      op == "+"               -> raw_expand_varspec(varspec, vars)
+      name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars, op == ";")
+      op in ["+", "#"]        -> raw_expand_varspec(varspec, vars)
       true                    -> expand_basic_varspec(varspec, vars)
     end
   end
 
-  defp expand_nvp_varspec(varspec, vars) do
-    "#{varspec}=#{expand_basic_varspec(varspec, vars)}"
+  defp expand_nvp_varspec(varspec, vars, skip_eq_if_blank) do
+    val = expand_basic_varspec(varspec, vars)
+    cond do
+      val in [nil,""] and skip_eq_if_blank -> varspec
+      true -> "#{varspec}=#{val}"
+    end
   end
 
   defp expand_basic_varspec(varspec, vars) do
-    raw_expand_varspec(varspec, vars) |> URI.encode
+    Dict.get(vars, varspec, "") |> render_to_string(&URI.char_unreserved?/1)
   end
 
   defp raw_expand_varspec(varspec, vars) do
-    Dict.get(vars, varspec, "") |> render_to_string
+    Dict.get(vars, varspec, "") |> render_to_string(&URI.char_unescaped?/1)
   end
 
-  defp render_to_string(val) do
-    case val do
-      vals when is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2 ->
-        vals
-          |> Enum.flat_map(fn {a,b} -> [a,b] end)
-          |> render_to_string
-
-      vals when is_list(vals) ->
-        vals
-          |> Enum.join(",")
-
-      val ->
-        val |> to_string
-    end
+  # render a Keywords list to a string
+  defp render_to_string(vals, esc_char_pred) when is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2  do
+    vals
+    |> Enum.flat_map(fn {a,b} -> [a,b] end)
+    |> render_to_string(esc_char_pred)
   end
-  defp d(arg, msg \\ nil) do
-    case msg do
-      nil -> IO.inspect arg
-      _ ->   IO.puts "#{msg}: #{inspect arg}"
-    end
 
-    arg
+  # render a normal list to a string
+  defp render_to_string(vals, esc_char_pred) when is_list(vals) do
+    vals
+    |> Enum.map(&render_to_string(&1, esc_char_pred))
+    |> Enum.join(",")
   end
+
+  # render anything else ito a string
+  defp render_to_string(val, esc_char_pred) do
+    val |> to_string |> URI.encode(esc_char_pred)
+  end
+
   defp parse_expression(expression) do
     %{"op" => op, "vars" => varlist} =
       Regex.named_captures(~r/(?<op>[+\#.\/;?&=,!@|]?)(?<vars>.*)/, expression)
