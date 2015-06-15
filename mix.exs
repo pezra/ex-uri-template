@@ -21,7 +21,6 @@ defmodule UriTemplate.Mixfile do
     [ files: git_files,
       licenses: ["http://opensource.org/licenses/MIT"],
       contributors: ["Peter Williams", "Julius Beckmann"],
-      links: %{"homepage": "http://github.com/pezra/ex-uri-template"}]
       links: %{"homepage": "http://github.com/pezra/ex-uri-template"} ]
   end
 
