@@ -4,8 +4,8 @@ UriTemplate
 [![Build Status](https://travis-ci.org/pezra/ex-uri-template.svg?branch=master)](https://travis-ci.org/pezra/ex-uri-template) 
 [![Hex.pm](https://img.shields.io/hexpm/v/uri_template.svg)](https://hex.pm/packages/uri_template)
 
-[RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
-processor. Completely supports level 3 and partially implements level 4.
+[RFC 6570](https://tools.ietf.org/html/rfc6570) compliant (level 3) URI template
+processor.
 
 Usage
 ----
