@@ -17,9 +17,6 @@ iex> UriTemplate.expand("http://example.com/{id}", id: 42)
 iex> UriTemplate.expand("http://example.com?q={terms}", terms: "fiz buzz")
 "http://example.com?q=fiz%20buzz"
 
-iex> UriTemplate.expand("http://example.com?q={+terms}", terms: "fiz%20buzz")
-"http://example.com?q=fiz%20buzz"
-
 iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
 "http://example.com?q=fiz,buzz"
 

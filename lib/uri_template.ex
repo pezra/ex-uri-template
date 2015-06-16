@@ -1,12 +1,10 @@
-
 defmodule UriTemplate do
   @moduledoc """
 
     [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
     processor. Currently supports level 3 completely and parts of level 4.
-
-
   """
+  alias UriTemplate.VarSpec, as: VarSpec
 
   @doc """
     Expand a RFC 6570 compliant URI template in to a full URI.
@@ -62,9 +60,10 @@ defmodule UriTemplate do
   end
 
   defp expand_expression(expression, vars) do
-    {op, leaders, varnames} = parse_expression(expression)
+    {op, leaders, varspecs} = parse_expression(expression)
 
-    Enum.map(varnames, &expand_varspec(&1, vars, op))
+    varspecs
+    |> Enum.map(&expand_varspec(&1, vars, op))
     |> Stream.zip(leaders)
     |> Enum.flat_map(fn {expanded_varspec, leader} -> [leader, expanded_varspec] end)
     |> Enum.join
@@ -80,44 +79,26 @@ defmodule UriTemplate do
 
   defp expand_nvp_varspec(varspec, vars, skip_eq_if_blank) do
     val = expand_basic_varspec(varspec, vars)
-    cond do
-      val in [nil,""] and skip_eq_if_blank -> varspec
-      true -> "#{varspec}=#{val}"
+    case {VarSpec.fetch(vars, varspec), skip_eq_if_blank} do
+      {{:ok, val}, _}   -> "#{varspec.name}=#{val}"
+      {:missing, true}  -> varspec.name
+      {:missing, false} -> "#{varspec.name}="
     end
   end
 
   defp expand_basic_varspec(varspec, vars) do
-    Dict.get(vars, varspec, "") |> render_to_string(&URI.char_unreserved?/1)
+    VarSpec.get(vars, varspec, "")
   end
 
   defp raw_expand_varspec(varspec, vars) do
-    Dict.get(vars, varspec, "") |> render_to_string(&URI.char_unescaped?/1)
-  end
-
-  # render a Keywords list to a string
-  defp render_to_string(vals, esc_char_pred) when is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2  do
-    vals
-    |> Enum.flat_map(fn {a,b} -> [a,b] end)
-    |> render_to_string(esc_char_pred)
-  end
-
-  # render a normal list to a string
-  defp render_to_string(vals, esc_char_pred) when is_list(vals) do
-    vals
-    |> Enum.map(&render_to_string(&1, esc_char_pred))
-    |> Enum.join(",")
-  end
-
-  # render anything else ito a string
-  defp render_to_string(val, esc_char_pred) do
-    val |> to_string |> URI.encode(esc_char_pred)
+    VarSpec.get(vars, varspec, "", false)
   end
 
   defp parse_expression(expression) do
     %{"op" => op, "vars" => varlist} =
       Regex.named_captures(~r/(?<op>[+\#.\/;?&=,!@|]?)(?<vars>.*)/, expression)
 
-    varspecs = String.split(varlist, ",") |> Enum.map(&:"#{&1}")
+    varspecs = String.split(varlist, ",") |> Enum.map(&VarSpec.from_string/1)
 
     {op, leaders_stream_for(op), varspecs}
   end
