@@ -7,6 +7,8 @@ defmodule UriTemplate do
   alias UriTemplate.VarSpec,    as: VarSpec
   alias UriTemplate.Expression, as: Expression
 
+  defstruct [:parts]
+
   @doc """
     Expand a RFC 6570 compliant URI template in to a full URI.
 
@@ -46,20 +48,42 @@ defmodule UriTemplate do
         "http://example.com#40,-105"
 
   """
-  def expand(tmpl, vars) do
-    Regex.scan(~r/([^{]*)(?:{([^}]+)})?/, tmpl, capture: :all_but_first)
-    |> Enum.flat_map(&expand_part(vars, &1))
+  def expand(tmpl, vars) when is_binary(tmpl) do
+    __MODULE__.from_string(tmpl)
+    |> expand(vars)
+  end
+
+  def expand(tmpl, vars) when is_map(tmpl) do
+    tmpl.parts
+    |> Enum.map(&expand_part(&1, vars))
     |> Enum.join
   end
 
-
-  defp expand_part(vars, [prefix, expr]) do
-    expr = Expression.from_string(expr)
-    [prefix, Expression.expand(expr, vars)]
+  @doc """
+    Returns a parsed template that can be expanded repeatedly with different variables.
+  """
+  def from_string(tmpl_str) do
+    %UriTemplate{parts: parse_template(tmpl_str) }
   end
 
-  defp expand_part(_, [prefix]) do
+  defp parse_template(str) do
+    Regex.scan(~r/([^{]*)(?:{([^}]+)})?/, str, capture: :all_but_first)
+    |> Enum.flat_map(&parse_part(&1))
+  end
+
+  defp expand_part(part, _) when is_binary(part) do
+    part
+  end
+
+  defp expand_part(expr, vars) do
+    Expression.expand(expr, vars)
+  end
+
+  defp parse_part([prefix, expr_str]) do
+    [prefix, Expression.from_string(expr_str)]
+  end
+
+  defp parse_part([prefix]) do
     [prefix]
   end
-
 end
