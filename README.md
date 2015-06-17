@@ -14,6 +14,12 @@ Usage
 iex> UriTemplate.expand("http://example.com/{id}", id: 42)
 "http://example.com/42"
 
+iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
+...> UriTemplate.expand(tmpl,  id: 42)
+"http://example.com/42"
+...> UriTemplate.expand(tmpl,  id: 84)
+"http://example.com/84"
+
 iex> UriTemplate.expand("http://example.com?q={terms}", terms: "fiz buzz")
 "http://example.com?q=fiz%20buzz"
 
