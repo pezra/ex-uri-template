@@ -1,8 +1,15 @@
 defmodule UriTemplate.Expression do
+  @moduledoc """
+  Represents an URI template expression (the bits surrounded in curly braces).
+  """
+
   alias UriTemplate.VarSpec, as: VarSpec
 
   defstruct [:op, :varspecs, :leaders]
 
+  @doc """
+  Returns a parsed expression that can be expanded using the `expand/2` function.
+  """
   def from_string(expr_str) do
     %{"op" => op, "vars" => varlist} =
       Regex.named_captures(~r/(?<op>[+\#.\/;?&=,!@|]?)(?<vars>.*)/, expr_str)
@@ -14,6 +21,9 @@ defmodule UriTemplate.Expression do
     }
   end
 
+  @doc """
+  Returns the expanded expression as a string.
+  """
   def expand(expression, vars) do
     expression.varspecs
     |> Enum.map(&expand_varspec(&1, vars, expression.op))

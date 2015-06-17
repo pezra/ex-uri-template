@@ -4,7 +4,6 @@ defmodule UriTemplate do
     [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
     processor. Currently supports level 3.
   """
-  alias UriTemplate.VarSpec,    as: VarSpec
   alias UriTemplate.Expression, as: Expression
 
   defstruct [:parts]
@@ -53,6 +52,15 @@ defmodule UriTemplate do
     |> expand(vars)
   end
 
+  @doc """
+  Expands a preparsed template.
+
+  ## Examples
+
+    iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
+    ...> UriTemplate.expand(tmpl,  id: 42)
+    "http://example.com/42"
+  """
   def expand(tmpl, vars) when is_map(tmpl) do
     tmpl.parts
     |> Enum.map(&expand_part(&1, vars))
@@ -60,7 +68,13 @@ defmodule UriTemplate do
   end
 
   @doc """
-    Returns a parsed template that can be expanded repeatedly with different variables.
+  Returns a parsed template that can be expanded repeatedly with different variables.
+
+  ## Examples
+
+    iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
+    ...> UriTemplate.expand(tmpl,  id: 42)
+    "http://example.com/42"
   """
   def from_string(tmpl_str) do
     %UriTemplate{parts: parse_template(tmpl_str) }
