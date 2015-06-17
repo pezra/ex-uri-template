@@ -4,7 +4,7 @@ defmodule UriTemplate.Mixfile do
   def project do
     [app: :uri_template,
      description: "RFC 6570 complient URI template processor",
-     version: "1.1.0",
+     version: "1.1.1",
      elixir: "~> 1.0",
      deps: deps,
      package: package]
@@ -41,6 +41,8 @@ defmodule UriTemplate.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:poison, "~> 1.4", only: :test}]
+    [{:poison, "~> 1.4", only: :test},
+     {:earmark, ">= 0.0.0", only: :dev},
+     {:ex_doc, "~> 0.7", only: :dev}]
   end
 end
