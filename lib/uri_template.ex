@@ -2,9 +2,10 @@ defmodule UriTemplate do
   @moduledoc """
 
     [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
-    processor. Currently supports level 3 completely and parts of level 4.
+    processor. Currently supports level 3.
   """
-  alias UriTemplate.VarSpec, as: VarSpec
+  alias UriTemplate.VarSpec,    as: VarSpec
+  alias UriTemplate.Expression, as: Expression
 
   @doc """
     Expand a RFC 6570 compliant URI template in to a full URI.
@@ -51,67 +52,14 @@ defmodule UriTemplate do
     |> Enum.join
   end
 
+
   defp expand_part(vars, [prefix, expr]) do
-    [prefix, expand_expression(expr, vars)]
+    expr = Expression.from_string(expr)
+    [prefix, Expression.expand(expr, vars)]
   end
 
   defp expand_part(_, [prefix]) do
     [prefix]
   end
 
-  defp expand_expression(expression, vars) do
-    {op, leaders, varspecs} = parse_expression(expression)
-
-    varspecs
-    |> Enum.map(&expand_varspec(&1, vars, op))
-    |> Stream.zip(leaders)
-    |> Enum.flat_map(fn {expanded_varspec, leader} -> [leader, expanded_varspec] end)
-    |> Enum.join
-  end
-
-  defp expand_varspec(varspec, vars, op) do
-    cond do
-      name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars, op == ";")
-      op in ["+", "#"]        -> raw_expand_varspec(varspec, vars)
-      true                    -> expand_basic_varspec(varspec, vars)
-    end
-  end
-
-  defp expand_nvp_varspec(varspec, vars, skip_eq_if_blank) do
-    val = expand_basic_varspec(varspec, vars)
-    case {VarSpec.fetch(vars, varspec), skip_eq_if_blank} do
-      {{:ok, val}, _}   -> "#{varspec.name}=#{val}"
-      {:missing, true}  -> varspec.name
-      {:missing, false} -> "#{varspec.name}="
-    end
-  end
-
-  defp expand_basic_varspec(varspec, vars) do
-    VarSpec.get(vars, varspec, "")
-  end
-
-  defp raw_expand_varspec(varspec, vars) do
-    VarSpec.get(vars, varspec, "", false)
-  end
-
-  defp parse_expression(expression) do
-    %{"op" => op, "vars" => varlist} =
-      Regex.named_captures(~r/(?<op>[+\#.\/;?&=,!@|]?)(?<vars>.*)/, expression)
-
-    varspecs = String.split(varlist, ",") |> Enum.map(&VarSpec.from_string/1)
-
-    {op, leaders_stream_for(op), varspecs}
-  end
-
-  defp name_value_pair_op?(op), do: Enum.member?([";","?","&"], op)
-
-  defp leaders_stream_for(op) do
-    case op do
-      ""  -> Stream.iterate("",  fn _ -> "," end)
-      "#" -> Stream.iterate("#", fn _ -> "," end)
-      "+" -> Stream.iterate("",  fn _ -> "," end)
-      "?" -> Stream.iterate("?", fn _ -> "&" end)
-      _   -> Stream.cycle([op])
-    end
-  end
 end
