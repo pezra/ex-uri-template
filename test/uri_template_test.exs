@@ -8,9 +8,17 @@ defmodule UriTemplateTest do
   (SharedUriTemplateTests.examples_in("spec-examples")
    ++ SharedUriTemplateTests.examples_in("extended-tests")
    ++ SharedUriTemplateTests.examples_in("negative-tests"))
-  |> Enum.filter(fn %{level: l} -> l < 4 end)
-  |> Enum.each(fn %{vars: vars, tmpl: tmpl, expected: expected, group: group} ->
+  |> Enum.filter(fn %{level: level} ->  level < 4 end)
+  |> Enum.map(fn %{vars: vars, tmpl: tmpl, expected: exp, group: group} ->
+    expected = case exp do
+                 _ when is_list(exp) -> exp
+                 _  -> [exp]
+               end
+
+    {vars, tmpl, expected, group}
+  end)
+  |> Enum.each(fn {vars, tmpl, expected, group} ->
     @vars vars
-    test "#{group}: <#{tmpl}>", do: assert UriTemplate.expand(unquote(tmpl), @vars) == unquote(expected)
+    test "#{group}: <#{tmpl}>", do: assert UriTemplate.expand(unquote(tmpl), @vars) in unquote(expected)
   end)
 end
