@@ -53,6 +53,9 @@ defmodule UriTemplate do
   ...> UriTemplate.expand(tmpl,  id: 84)
   "http://example.com/84"
 
+  iex> UriTemplate.expand("http://example.com/{longstr:6}", longstr: "thisisquitealongstring")
+  "http://example.com/thisis"
+
   ```
   """
   def expand(tmpl, vars) when is_binary(tmpl) do

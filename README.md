@@ -52,6 +52,10 @@ iex> UriTemplate.expand("http://example.com/test{.fmt}", fmt: "json")
 
 iex> UriTemplate.expand("http://example.com{#lat,lng}", lat: 40, lng: -105)
 "http://example.com#40,-105"
+
+iex> UriTemplate.expand("http://example.com/{longstr:6}", longstr: "thisisquitealongstring")
+"http://example.com/thisis"
+
 ```
 
 Installation
