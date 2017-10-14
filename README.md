@@ -66,3 +66,15 @@ Add the following to your project `:deps` list:
 ```elixir
 {:uri_template, "~>1.0"}
 ```
+
+Contributing
+---
+
+To run the tests:
+
+```sh
+mix deps.get
+git submodule update --init
+mix test
+```
+
