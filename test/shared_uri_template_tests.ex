@@ -8,11 +8,11 @@ defmodule SharedUriTemplateTests do
   end
 
   defp group_to_examples({name, info}) do
-    Dict.fetch!(info, "testcases")
+    Map.fetch!(info, "testcases")
     |> Enum.map(fn [tmpl, expected] ->
       %{ group: name,
-         level: Dict.get(info, "level", 4),
-         vars: Dict.fetch!(info, "variables") |> symbolize_keys,
+         level: Map.get(info, "level", 4),
+         vars: Map.fetch!(info, "variables") |> symbolize_keys,
          tmpl: tmpl,
          expected: expected }
     end)

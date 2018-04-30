@@ -27,7 +27,8 @@ defmodule UriTemplate.VarSpec do
   is returned
   """
   def fetch(vars, varspec, encode_value? \\ true) do
-    case Dict.fetch(vars, varspec.key) do
+    vars = Map.new(vars)
+    case Map.fetch(vars, varspec.key) do
       {:ok, nil} -> :missing
       {:ok, ""}  -> :missing
       :error     -> :missing

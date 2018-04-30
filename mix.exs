@@ -6,8 +6,8 @@ defmodule UriTemplate.Mixfile do
      description: "RFC 6570 complient URI template processor",
      version: "1.2.0",
      elixir: "~> 1.0",
-     deps: deps,
-     package: package]
+     deps: deps(),
+     package: package()]
   end
 
   defp git_files do
@@ -18,7 +18,7 @@ defmodule UriTemplate.Mixfile do
   end
 
   defp package do
-    [ files: git_files,
+    [ files: git_files(),
       licenses: ["http://opensource.org/licenses/MIT"],
       contributors: ["Peter Williams", "Julius Beckmann"],
       links: %{"homepage": "http://github.com/pezra/ex-uri-template"} ]

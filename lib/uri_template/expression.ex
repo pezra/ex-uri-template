@@ -41,7 +41,7 @@ defmodule UriTemplate.Expression do
   end
 
   defp expand_nvp_varspec(varspec, vars, skip_eq_if_blank) do
-    val = expand_basic_varspec(varspec, vars)
+    _val = expand_basic_varspec(varspec, vars)
     case {VarSpec.fetch(vars, varspec), skip_eq_if_blank} do
       {{:ok, val}, _}   -> "#{varspec.name}=#{val}"
       {:missing, true}  -> varspec.name
