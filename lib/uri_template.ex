@@ -65,7 +65,7 @@ defmodule UriTemplate do
   def expand(tmpl, vars) when is_map(tmpl) do
     tmpl.parts
     |> Enum.map(&expand_part(&1, vars))
-    |> Enum.join
+    |> Enum.join()
   end
 
   @doc """
@@ -81,7 +81,7 @@ defmodule UriTemplate do
   ```
   """
   def from_string(tmpl_str) do
-    %UriTemplate{parts: parse_template(tmpl_str) }
+    %UriTemplate{parts: parse_template(tmpl_str)}
   end
 
   defp parse_template(str) do

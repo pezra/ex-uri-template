@@ -29,22 +29,23 @@ defmodule UriTemplate.Expression do
     |> Enum.map(&expand_varspec(&1, vars, expression.op))
     |> Stream.zip(expression.leaders)
     |> Enum.flat_map(fn {expanded_varspec, leader} -> [leader, expanded_varspec] end)
-    |> Enum.join
+    |> Enum.join()
   end
 
   defp expand_varspec(varspec, vars, op) do
     cond do
       name_value_pair_op?(op) -> expand_nvp_varspec(varspec, vars, op == ";")
-      op in ["+", "#"]        -> raw_expand_varspec(varspec, vars)
-      true                    -> expand_basic_varspec(varspec, vars)
+      op in ["+", "#"] -> raw_expand_varspec(varspec, vars)
+      true -> expand_basic_varspec(varspec, vars)
     end
   end
 
   defp expand_nvp_varspec(varspec, vars, skip_eq_if_blank) do
     _val = expand_basic_varspec(varspec, vars)
+
     case {VarSpec.fetch(vars, varspec), skip_eq_if_blank} do
-      {{:ok, val}, _}   -> "#{varspec.name}=#{val}"
-      {:missing, true}  -> varspec.name
+      {{:ok, val}, _} -> "#{varspec.name}=#{val}"
+      {:missing, true} -> varspec.name
       {:missing, false} -> "#{varspec.name}="
     end
   end
@@ -57,16 +58,15 @@ defmodule UriTemplate.Expression do
     VarSpec.get(vars, varspec, "", false)
   end
 
-  defp name_value_pair_op?(op), do: Enum.member?([";","?","&"], op)
+  defp name_value_pair_op?(op), do: Enum.member?([";", "?", "&"], op)
 
   defp leaders_stream_for(op) do
     case op do
-      ""  -> Stream.iterate("",  fn _ -> "," end)
+      "" -> Stream.iterate("", fn _ -> "," end)
       "#" -> Stream.iterate("#", fn _ -> "," end)
-      "+" -> Stream.iterate("",  fn _ -> "," end)
+      "+" -> Stream.iterate("", fn _ -> "," end)
       "?" -> Stream.iterate("?", fn _ -> "&" end)
-      _   -> Stream.cycle([op])
+      _ -> Stream.cycle([op])
     end
   end
-
 end

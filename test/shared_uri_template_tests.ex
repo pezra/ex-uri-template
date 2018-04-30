@@ -10,17 +10,19 @@ defmodule SharedUriTemplateTests do
   defp group_to_examples({name, info}) do
     Map.fetch!(info, "testcases")
     |> Enum.map(fn [tmpl, expected] ->
-      %{ group: name,
-         level: Map.get(info, "level", 4),
-         vars: Map.fetch!(info, "variables") |> symbolize_keys,
-         tmpl: tmpl,
-         expected: expected }
+      %{
+        group: name,
+        level: Map.get(info, "level", 4),
+        vars: Map.fetch!(info, "variables") |> symbolize_keys,
+        tmpl: tmpl,
+        expected: expected
+      }
     end)
   end
 
   defp symbolize_keys(a_map) do
     a_map
-    |> Enum.map(fn {k,v} -> {:"#{k}", v} end)
+    |> Enum.map(fn {k, v} -> {:"#{k}", v} end)
     |> Enum.into(%{})
   end
 
@@ -32,5 +34,4 @@ defmodule SharedUriTemplateTests do
   defp examples_file(name) do
     __DIR__ <> "/../vendor/uritemplate-test/#{name}.json"
   end
-
 end
