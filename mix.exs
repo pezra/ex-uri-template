@@ -2,26 +2,30 @@ defmodule UriTemplate.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :uri_template,
-     description: "RFC 6570 complient URI template processor",
-     version: "1.2.0",
-     elixir: "~> 1.0",
-     deps: deps,
-     package: package]
+    [
+      app: :uri_template,
+      description: "RFC 6570 complient URI template processor",
+      version: "1.2.0",
+      elixir: "~> 1.3",
+      deps: deps(),
+      package: package()
+    ]
   end
 
   defp git_files do
     System.cmd("git", ["ls-files", "-z"])
-      |> (fn {x,_} -> x end).()
-      |> String.split(<<0>>)
-      |> Enum.filter(fn x -> x != "" end)
+    |> (fn {x, _} -> x end).()
+    |> String.split(<<0>>)
+    |> Enum.filter(fn x -> x != "" end)
   end
 
   defp package do
-    [ files: git_files,
+    [
+      files: git_files(),
       licenses: ["http://opensource.org/licenses/MIT"],
       contributors: ["Peter Williams", "Julius Beckmann"],
-      links: %{"homepage": "http://github.com/pezra/ex-uri-template"} ]
+      links: %{homepage: "http://github.com/pezra/ex-uri-template"}
+    ]
   end
 
   # Configuration for the OTP application
@@ -41,8 +45,10 @@ defmodule UriTemplate.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:poison, "~> 1.4", only: :test},
-     {:earmark, ">= 0.0.0", only: :dev},
-     {:ex_doc, "~> 0.7", only: :dev}]
+    [
+      {:poison, "~> 1.4", only: :test},
+      {:earmark, ">= 0.0.0", only: :dev},
+      {:ex_doc, "~> 0.7", only: :dev}
+    ]
   end
 end

@@ -13,10 +13,11 @@ defmodule UriTemplate.VarSpec do
     %{"name" => name, "limit" => lim} =
       Regex.named_captures(~r/(?<name>[^\:]+)[:]?(?(?<=:)(?<limit>[\d]+))/, varspec_str)
 
-    {limit, _} = case lim do
-                   "" -> {:none, nil}
-                   _ -> Integer.parse(lim)
-                 end
+    {limit, _} =
+      case lim do
+        "" -> {:none, nil}
+        _ -> Integer.parse(lim)
+      end
 
     %__MODULE__{name: name, key: :"#{name}", limit: limit}
   end
@@ -27,10 +28,12 @@ defmodule UriTemplate.VarSpec do
   is returned
   """
   def fetch(vars, varspec, encode_value? \\ true) do
-    case Dict.fetch(vars, varspec.key) do
+    vars = Map.new(vars)
+
+    case Map.fetch(vars, varspec.key) do
       {:ok, nil} -> :missing
-      {:ok, ""}  -> :missing
-      :error     -> :missing
+      {:ok, ""} -> :missing
+      :error -> :missing
       {:ok, val} -> {:ok, val |> render_to_string(char_pred(encode_value?), varspec.limit)}
     end
   end
@@ -41,14 +44,15 @@ defmodule UriTemplate.VarSpec do
   def get(vars, varspec, default \\ "", encode_value? \\ true) do
     case fetch(vars, varspec, encode_value?) do
       {:ok, val} -> val
-      :missing   -> default |> render_to_string(char_pred(encode_value?), varspec.limit)
+      :missing -> default |> render_to_string(char_pred(encode_value?), varspec.limit)
     end
   end
 
   # render a Keywords list to a string
-  defp render_to_string(vals, esc_char_pred, limit) when (is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2) or is_map(vals) do
+  defp render_to_string(vals, esc_char_pred, limit)
+       when (is_list(vals) and is_tuple(hd(vals)) and tuple_size(hd(vals)) == 2) or is_map(vals) do
     vals
-    |> Enum.flat_map(fn {a,b} -> [a,b] end)
+    |> Enum.flat_map(fn {a, b} -> [a, b] end)
     |> render_to_string(esc_char_pred, limit)
   end
 
@@ -66,7 +70,7 @@ defmodule UriTemplate.VarSpec do
 
   # render anything else ito a string
   defp render_to_string(val, esc_char_pred, limit) do
-    val |> to_string |> String.slice(0..(limit-1)) |> URI.encode(esc_char_pred)
+    val |> to_string |> String.slice(0..(limit - 1)) |> URI.encode(esc_char_pred)
   end
 
   defp char_pred(true) do
@@ -77,4 +81,3 @@ defmodule UriTemplate.VarSpec do
     &URI.char_unescaped?/1
   end
 end
-

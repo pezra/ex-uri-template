@@ -1,6 +1,5 @@
 defmodule UriTemplate do
   @moduledoc """
-
     [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
     processor. Currently supports level 3.
   """
@@ -47,10 +46,10 @@ defmodule UriTemplate do
   iex> UriTemplate.expand("http://example.com{#lat,lng}", lat: 40, lng: -105)
   "http://example.com#40,-105"
 
-  iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
-  ...> UriTemplate.expand(tmpl,  id: 42)
+  iex(1)> tmpl = UriTemplate.from_string "http://example.com/{id}"
+  iex(2)> UriTemplate.expand(tmpl, id: 42)
   "http://example.com/42"
-  ...> UriTemplate.expand(tmpl,  id: 84)
+  iex(3)> UriTemplate.expand(tmpl, id: 84)
   "http://example.com/84"
 
   iex> UriTemplate.expand("http://example.com/{longstr:6}", longstr: "thisisquitealongstring")
@@ -66,7 +65,7 @@ defmodule UriTemplate do
   def expand(tmpl, vars) when is_map(tmpl) do
     tmpl.parts
     |> Enum.map(&expand_part(&1, vars))
-    |> Enum.join
+    |> Enum.join()
   end
 
   @doc """
@@ -82,7 +81,7 @@ defmodule UriTemplate do
   ```
   """
   def from_string(tmpl_str) do
-    %UriTemplate{parts: parse_template(tmpl_str) }
+    %UriTemplate{parts: parse_template(tmpl_str)}
   end
 
   defp parse_template(str) do
