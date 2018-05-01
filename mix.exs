@@ -5,7 +5,7 @@ defmodule UriTemplate.Mixfile do
     [
       app: :uri_template,
       description: "RFC 6570 complient URI template processor",
-      version: "1.2.0",
+      version: "1.2.1",
       elixir: "~> 1.3",
       deps: deps(),
       package: package()
