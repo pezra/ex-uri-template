@@ -1,7 +1,7 @@
 defmodule UriTemplate do
   @moduledoc """
-    [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
-    processor. Currently supports level 3.
+  [RFC 6570](https://tools.ietf.org/html/rfc6570) compliant URI template
+  processor. Currently supports level 3.
   """
   alias UriTemplate.Expression, as: Expression
 
@@ -12,50 +12,48 @@ defmodule UriTemplate do
 
   ## Examples
 
-  ```
-  iex> UriTemplate.expand("http://example.com/{id}", id: 42)
-  "http://example.com/42"
+      iex> UriTemplate.expand("http://example.com/{id}", id: 42)
+      "http://example.com/42"
 
-  iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
-  "http://example.com?q=fiz,buzz"
+      iex> UriTemplate.expand("http://example.com?q={terms}", terms: ["fiz", "buzz"])
+      "http://example.com?q=fiz,buzz"
 
-  iex> UriTemplate.expand("http://example.com?{k}", k: [one: 1, two: 2])
-  "http://example.com?one,1,two,2"
+      iex> UriTemplate.expand("http://example.com?{k}", k: [one: 1, two: 2])
+      "http://example.com?one,1,two,2"
 
-  iex> UriTemplate.expand("http://example.com/test", id: 42)
-  "http://example.com/test"
+      iex> UriTemplate.expand("http://example.com/test", id: 42)
+      "http://example.com/test"
 
-  iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
-  "http://example.com/40,-105"
+      iex> UriTemplate.expand("http://example.com/{lat,lng}", lat: 40, lng: -105)
+      "http://example.com/40,-105"
 
-  iex> UriTemplate.expand("http://example.com/{;lat,lng}", lat: 40, lng: -105)
-  "http://example.com/;lat=40;lng=-105"
+      iex> UriTemplate.expand("http://example.com/{;lat,lng}", lat: 40, lng: -105)
+      "http://example.com/;lat=40;lng=-105"
 
-  iex> UriTemplate.expand("http://example.com/{?lat,lng}", lat: 40, lng: -105)
-  "http://example.com/?lat=40&lng=-105"
+      iex> UriTemplate.expand("http://example.com/{?lat,lng}", lat: 40, lng: -105)
+      "http://example.com/?lat=40&lng=-105"
 
-  iex> UriTemplate.expand("http://example.com/?test{&lat,lng}", lat: 40, lng: -105)
-  "http://example.com/?test&lat=40&lng=-105"
+      iex> UriTemplate.expand("http://example.com/?test{&lat,lng}", lat: 40, lng: -105)
+      "http://example.com/?test&lat=40&lng=-105"
 
-  iex> UriTemplate.expand("http://example.com{/lat,lng}", lat: 40, lng: -105)
-  "http://example.com/40/-105"
+      iex> UriTemplate.expand("http://example.com{/lat,lng}", lat: 40, lng: -105)
+      "http://example.com/40/-105"
 
-  iex> UriTemplate.expand("http://example.com/test{.fmt}", fmt: "json")
-  "http://example.com/test.json"
+      iex> UriTemplate.expand("http://example.com/test{.fmt}", fmt: "json")
+      "http://example.com/test.json"
 
-  iex> UriTemplate.expand("http://example.com{#lat,lng}", lat: 40, lng: -105)
-  "http://example.com#40,-105"
+      iex> UriTemplate.expand("http://example.com{#lat,lng}", lat: 40, lng: -105)
+      "http://example.com#40,-105"
 
-  iex(1)> tmpl = UriTemplate.from_string "http://example.com/{id}"
-  iex(2)> UriTemplate.expand(tmpl, id: 42)
-  "http://example.com/42"
-  iex(3)> UriTemplate.expand(tmpl, id: 84)
-  "http://example.com/84"
+      iex(1)> tmpl = UriTemplate.from_string "http://example.com/{id}"
+      iex(2)> UriTemplate.expand(tmpl, id: 42)
+      "http://example.com/42"
+      iex(3)> UriTemplate.expand(tmpl, id: 84)
+      "http://example.com/84"
 
-  iex> UriTemplate.expand("http://example.com/{longstr:6}", longstr: "thisisquitealongstring")
-  "http://example.com/thisis"
+      iex> UriTemplate.expand("http://example.com/{longstr:6}", longstr: "thisisquitealongstring")
+      "http://example.com/thisis"
 
-  ```
   """
   def expand(tmpl, vars) when is_binary(tmpl) do
     __MODULE__.from_string(tmpl)
@@ -69,16 +67,15 @@ defmodule UriTemplate do
   end
 
   @doc """
-  Returns a parsed template that can be expanded repeatedly with different variables.
+  Returns a parsed template that can be expanded repeatedly with different
+  variables.
 
   ## Examples
 
-  ```
-  iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
-  ...> UriTemplate.expand(tmpl,  id: 42)
-  "http://example.com/42"
+      iex> tmpl = UriTemplate.from_string "http://example.com/{id}"
+      ...> UriTemplate.expand(tmpl,  id: 42)
+      "http://example.com/42"
 
-  ```
   """
   def from_string(tmpl_str) do
     %UriTemplate{parts: parse_template(tmpl_str)}
