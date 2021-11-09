@@ -1,13 +1,16 @@
 defmodule UriTemplate.Mixfile do
   use Mix.Project
 
+  @source_url "http://github.com/pezra/ex-uri-template"
+  @version "1.2.1"
+
   def project do
     [
       app: :uri_template,
-      description: "RFC 6570 complient URI template processor",
-      version: "1.2.1",
+      version: @version,
       elixir: "~> 1.3",
       deps: deps(),
+      docs: docs(),
       package: package()
     ]
   end
@@ -21,34 +24,35 @@ defmodule UriTemplate.Mixfile do
 
   defp package do
     [
+      description: "RFC 6570 compliant URI template processor",
       files: git_files(),
-      licenses: ["http://opensource.org/licenses/MIT"],
+      licenses: ["MIT"],
       contributors: ["Peter Williams", "Julius Beckmann"],
-      links: %{homepage: "http://github.com/pezra/ex-uri-template"}
+      links: %{GitHub: @source_url}
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type `mix help compile.app` for more information
   def application do
     []
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type `mix help deps` for more examples and options
   defp deps do
     [
       {:poison, "~> 1.4", only: :test},
       {:earmark, ">= 0.0.0", only: :dev},
-      {:ex_doc, "~> 0.7", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "README.md": [title: "Overview"]
+      ],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatters: ["html"]
     ]
   end
 end

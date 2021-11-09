@@ -6,7 +6,7 @@ defmodule UriTemplate.VarSpec do
   defstruct [:name, :key, :limit]
 
   @doc """
-  Parses `varspec_str` and returns a `UriTemplate.VarSpec struct representing
+  Parses `varspec_str` and returns a `UriTemplate.VarSpec` struct representing
   it.
   """
   def from_string(varspec_str) do
@@ -39,7 +39,7 @@ defmodule UriTemplate.VarSpec do
   end
 
   @doc """
-  Returns the URI encoded value of the variable specified, or the default
+  Returns the URI encoded value of the variable specified, or the default.
   """
   def get(vars, varspec, default \\ "", encode_value? \\ true) do
     case fetch(vars, varspec, encode_value?) do
